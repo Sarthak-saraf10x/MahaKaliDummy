@@ -433,44 +433,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------------------------------------------------------------------
   // 10. Form Validation & Booking Modal Logic
   // ------------------------------------------------------------------
-  // Search Form Handling
-  const searchForm = document.getElementById('search-tours-form');
-  if (searchForm) {
-    searchForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const date = document.getElementById('search-date')?.value;
-      const type = document.getElementById('search-type')?.value;
-      const alertBox = document.getElementById('search-alert');
-
-      if (alertBox) alertBox.style.display = "none";
-      
-      let message = "Searching available tours...";
-      if (type && type !== "all") {
-        message = `Searching available ${type} tours...`;
-        
-        // Filter packages matching the selected tour type
-        const filterBtn = document.querySelector(`.filter-btn[data-filter="${type}"]`);
-        if (filterBtn) {
-          filterBtn.click();
-        } else {
-          // If there is no exact filter button matching (like family/honeymoon), filter manually
-          const filtered = tourPackagesData.filter(p => p.category === type);
-          renderPackages(filtered);
-          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        }
-      } else {
-        const filterBtn = document.querySelector(`.filter-btn[data-filter="all"]`);
-        if (filterBtn) {
-          filterBtn.click();
-        }
-      }
-
-      showToast(message, "info");
-      
-      // Scroll smoothly to package section
-      document.getElementById('packages')?.scrollIntoView({ behavior: 'smooth' });
-    });
-  }
 
   // Booking Modal Handler
   const bookingModalElem = document.getElementById('bookingModal');
