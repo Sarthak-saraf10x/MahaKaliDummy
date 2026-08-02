@@ -225,23 +225,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="package-price-label">Starting From</span>
                 <div class="package-price">₹${pkg.price.toLocaleString('en-IN')} <span>/ person</span></div>
               </div>
-              <button class="btn-custom btn-primary-custom book-pkg-btn" data-pkg-id="${pkg.id}" data-pkg-title="${pkg.title}" data-pkg-price="${pkg.price}">
+              <a href="https://wa.me/917517685951?text=${encodeURIComponent(`Hello Mahakali Tours & Travels, I want to book the *${pkg.title}* package (Price: ₹${pkg.price.toLocaleString('en-IN')} / person). Please provide details.`)}" target="_blank" class="btn-custom btn-primary-custom">
                 Book Now <i class="fa-solid fa-arrow-right ms-1"></i>
-              </button>
+              </a>
             </div>
           </div>
         </div>
       </div>
     `).join('');
-
-    // Attach click handlers to Book Now buttons
-    document.querySelectorAll('.book-pkg-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const title = btn.getAttribute('data-pkg-title');
-        const price = btn.getAttribute('data-pkg-price');
-        openBookingModal(title, price);
-      });
-    });
   }
 
   renderPackages(tourPackagesData);
@@ -397,9 +388,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="gt-action">
               <div class="gt-price">₹${tour.price.toLocaleString('en-IN')} <span class="fs-6 fw-normal text-muted">/ person</span></div>
-              <button class="btn-custom btn-primary-custom book-pkg-btn" data-pkg-title="${tour.destination}" data-pkg-price="${tour.price}">
+              <a href="https://wa.me/917517685951?text=${encodeURIComponent(`Hello Mahakali Tours & Travels, I would like to reserve a seat for the upcoming *${tour.destination}* on *${tour.date}* (Price: ₹${tour.price.toLocaleString('en-IN')} / person). Please confirm availability.`)}" target="_blank" class="btn-custom btn-primary-custom">
                 Reserve Seat <i class="fa-solid fa-bolt ms-1"></i>
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -567,7 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const whatsappWidget = document.querySelector('.whatsapp-float');
   if (whatsappWidget) {
     whatsappWidget.addEventListener('click', () => {
-      const phoneNumber = "919876543210";
+      const phoneNumber = "917517685951";
       const defaultText = encodeURIComponent("Hello Mahakali Tours & Travels, I would like to inquire about Maharashtra tour packages.");
       window.open(`https://wa.me/${phoneNumber}?text=${defaultText}`, '_blank');
     });
