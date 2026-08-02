@@ -37,6 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------------------------------------------------------------------
   const headerArea = document.querySelector('.header-area');
   const backToTopBtn = document.querySelector('.back-to-top');
+  const sections = document.querySelectorAll('section[id]');
+  const mainNavLinks = document.querySelectorAll('.header-area .nav-link');
 
   window.addEventListener('scroll', () => {
     if (window.scrollY > 60) {
@@ -50,6 +52,43 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       backToTopBtn?.classList.remove('active');
     }
+
+    // Scrollspy active section highlighting
+    let currentSectionId = '';
+    const scrollPosition = window.scrollY + 160;
+    const isAtBottom = (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50;
+
+    if (isAtBottom) {
+      currentSectionId = 'contact';
+    } else if (window.scrollY < 100) {
+      currentSectionId = 'home';
+    } else {
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+          currentSectionId = section.getAttribute('id');
+        }
+      });
+    }
+
+    if (currentSectionId) {
+      mainNavLinks.forEach(link => {
+        if (link.getAttribute('href') === `#${currentSectionId}`) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+  });
+
+  // Handle click active highlighting
+  mainNavLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      mainNavLinks.forEach(item => item.classList.remove('active'));
+      link.classList.add('active');
+    });
   });
 
   if (backToTopBtn) {
