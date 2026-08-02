@@ -61,27 +61,49 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mobile Nav Drawer Toggle
   const navToggle = document.querySelector('.mobile-nav-toggle');
   const navCollapse = document.querySelector('.navbar-collapse');
-  const navLinks = document.querySelectorAll('.nav-link');
 
   if (navToggle && navCollapse) {
-    navToggle.addEventListener('click', () => {
-      navCollapse.classList.toggle('show');
-      const icon = navToggle.querySelector('i');
-      if (icon) {
-        icon.classList.toggle('fa-bars');
-        icon.classList.toggle('fa-xmark');
-      }
-    });
-
-    navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        navCollapse.classList.remove('show');
+    const toggleMenu = (open) => {
+      const isOpen = open !== undefined ? open : !navCollapse.classList.contains('show');
+      if (isOpen) {
+        navCollapse.classList.add('show');
+        document.body.classList.add('mobile-nav-active');
         const icon = navToggle.querySelector('i');
         if (icon) {
-          icon.classList.add('fa-bars');
-          icon.classList.remove('fa-xmark');
+          icon.classList.remove('fa-bars');
+          icon.classList.add('fa-xmark');
         }
+      } else {
+        navCollapse.classList.remove('show');
+        document.body.classList.remove('mobile-nav-active');
+        const icon = navToggle.querySelector('i');
+        if (icon) {
+          icon.classList.remove('fa-xmark');
+          icon.classList.add('fa-bars');
+        }
+      }
+    };
+
+    navToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    // Close when clicking any link inside the mobile drawer
+    const drawerLinks = navCollapse.querySelectorAll('a');
+    drawerLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        toggleMenu(false);
       });
+    });
+
+    // Close when clicking outside of the drawer & toggle button
+    document.addEventListener('click', (e) => {
+      if (navCollapse.classList.contains('show')) {
+        if (!navCollapse.contains(e.target) && !navToggle.contains(e.target)) {
+          toggleMenu(false);
+        }
+      }
     });
   }
 

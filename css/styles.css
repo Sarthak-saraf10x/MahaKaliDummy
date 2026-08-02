@@ -1698,6 +1698,33 @@ img {
   to { opacity: 1; transform: translateX(0); }
 }
 
+/* Mobile Nav Overlay Fader & Page Locking */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(30, 20, 15, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+body.mobile-nav-active::before {
+  opacity: 1;
+  pointer-events: auto;
+}
+body.mobile-nav-active {
+  overflow: hidden;
+}
+body.mobile-nav-active .mobile-nav-toggle {
+  color: var(--color-white) !important;
+}
+
 /* Media Queries */
 @media (max-width: 991px) {
   .hero-title {
@@ -1710,6 +1737,7 @@ img {
     display: block;
   }
   .navbar-collapse {
+    display: block !important;
     position: fixed;
     top: 0;
     right: -320px;
@@ -1724,9 +1752,17 @@ img {
   .navbar-collapse.show {
     right: 0;
   }
-  .nav-link {
+  .navbar-collapse .nav-link {
+    color: rgba(255, 255, 255, 0.95) !important;
     font-size: 1.1rem;
     padding: 12px 0 !important;
+  }
+  .navbar-collapse .nav-link::after {
+    display: none; /* Hide hover underline for vertical links */
+  }
+  .navbar-collapse .nav-link:hover,
+  .navbar-collapse .nav-link.active {
+    color: var(--color-orange) !important;
   }
 }
 
