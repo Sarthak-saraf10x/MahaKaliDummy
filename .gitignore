@@ -1,0 +1,7 @@
+# Ignore separate backend repository
+backend/
+
+# Node modules & OS files
+node_modules/
+.DS_Store
+Thumbs.db
