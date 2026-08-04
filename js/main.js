@@ -614,6 +614,91 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ------------------------------------------------------------------
+  // 11b. Corporate Travel Solutions Section Logic
+  // ------------------------------------------------------------------
+  
+  // Corporate Modal Handler
+  const corporateModalElem = document.getElementById('corporateModal');
+  let corporateModalInstance;
+  if (corporateModalElem) {
+    corporateModalInstance = new bootstrap.Modal(corporateModalElem);
+  }
+
+  // Globally scope openCorporateModal so onclick event can fire it
+  window.openCorporateModal = function() {
+    if (corporateModalInstance) {
+      corporateModalInstance.show();
+    }
+  };
+
+  // Corporate Booking Form Handler
+  const corpBookingForm = document.getElementById('corp-booking-form');
+  if (corpBookingForm) {
+    corpBookingForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const company = document.getElementById('corpCompanyName')?.value;
+      const contact = document.getElementById('corpContactName')?.value;
+      const email = document.getElementById('corpEmail')?.value;
+      const phone = document.getElementById('corpPhone')?.value;
+      const service = document.getElementById('corpServiceType')?.value;
+      const message = document.getElementById('corpMsg')?.value;
+
+      if (!company || !contact || !email || !phone || !message) {
+        showToast("Please fill in all required fields.", "error");
+        return;
+      }
+
+      // Hide Modal
+      if (corporateModalInstance) {
+        corporateModalInstance.hide();
+      }
+
+      // Success Notification
+      showToast(`💼 Thank you ${contact}! Your RFP for ${company} has been received. Our B2B Account Manager will reach out to you within 2 hours.`, "success");
+      corpBookingForm.reset();
+    });
+  }
+
+  // Corporate Statistics Counter Animation
+  const corpCounters = document.querySelectorAll('.corp-stat-number');
+  let corpAnimated = false;
+
+  function runCorpCounters() {
+    corpCounters.forEach(counter => {
+      const target = +counter.getAttribute('data-corp-target');
+      const suffix = counter.getAttribute('data-suffix') || '';
+      let count = 0;
+      const speed = target / 60; // Run in 60 steps
+
+      const updateCount = () => {
+        count += speed;
+        if (count < target) {
+          counter.innerText = Math.ceil(count).toLocaleString('en-IN') + suffix;
+          setTimeout(updateCount, 25);
+        } else {
+          counter.innerText = target.toLocaleString('en-IN') + suffix;
+        }
+      };
+      updateCount();
+    });
+  }
+
+  function checkCorpCounters() {
+    const corpCounterSection = document.querySelector('.corp-stats-wrapper');
+    if (corpCounterSection && !corpAnimated) {
+      const pos = corpCounterSection.getBoundingClientRect().top;
+      if (pos < window.innerHeight - 50) {
+        runCorpCounters();
+        corpAnimated = true;
+      }
+    }
+  }
+
+  window.addEventListener('scroll', checkCorpCounters);
+  // Also check immediately in case the section is already in view on load
+  setTimeout(checkCorpCounters, 1500);
+
+  // ------------------------------------------------------------------
   // 12. Floating WhatsApp Direct Chat Widget
   // ------------------------------------------------------------------
   const whatsappWidget = document.querySelector('.whatsapp-float');
