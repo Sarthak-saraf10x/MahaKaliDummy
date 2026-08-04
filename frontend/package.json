@@ -1,0 +1,17 @@
+{
+  "name": "mahakali-frontend",
+  "version": "1.0.0",
+  "description": "Mahakali Tours & Travels Decoupled Frontend",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx -y serve -l 3000 ."
+  },
+  "keywords": [
+    "mahakali-tours",
+    "frontend",
+    "html5",
+    "bootstrap5"
+  ],
+  "author": "Mahakali Dev Team",
+  "license": "ISC"
+}

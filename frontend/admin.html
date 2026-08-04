@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Mahakali Tours & Travels</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Sign-In SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card: rgba(30, 41, 59, 0.85);
+      --accent-gold: #d97706;
+      --accent-gold-hover: #b45309;
+      --text-light: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+    }
+
+    /* Auth Screen */
+    #authContainer {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+    }
+
+    .auth-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    .brand-logo {
+      color: var(--accent-gold);
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+
+    /* Dashboard Layout */
+    .sidebar {
+      background: rgba(15, 23, 42, 0.95);
+      border-right: 1px solid var(--border-color);
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+
+    .nav-link-custom {
+      color: var(--text-muted);
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+
+    .nav-link-custom:hover, .nav-link-custom.active {
+      color: #fff;
+      background: rgba(217, 119, 6, 0.15);
+      border-left: 4px solid var(--accent-gold);
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: rgba(217, 119, 6, 0.2);
+      color: var(--accent-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .table-dark-custom {
+      background: var(--bg-card);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .table-dark-custom th {
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--accent-gold);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-dark-custom td {
+      vertical-align: middle;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-light);
+    }
+
+    .modal-content-custom {
+      background: #1e293b;
+      color: var(--text-light);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+    }
+
+    .btn-gold {
+      background: var(--accent-gold);
+      color: #fff;
+      border: none;
+      font-weight: 600;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+    }
+
+    .btn-gold:hover {
+      background: var(--accent-gold-hover);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== 1. LOGIN SCREEN ==================== -->
+  <div id="authContainer">
+    <div class="auth-card text-center">
+      <div class="brand-logo mb-3">
+        <i class="fa-solid fa-bus-simple me-2"></i> Mahakali Admin
+      </div>
+      <h4 class="fw-bold text-white mb-2">Google Admin Login</h4>
+      <p class="text-muted small mb-4">Sign in with an authorized Google account to manage Mahakali Tours & Travels backend.</p>
+
+      <div id="accessDeniedAlert" class="alert alert-danger d-none text-start small mb-3">
+        <i class="fa-solid fa-circle-exclamation me-2"></i> <span id="accessDeniedText">Access Denied: Unauthorized admin account.</span>
+      </div>
+
+      <!-- Google Official Button -->
+      <div id="g_id_onload"
+           data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+           data-callback="handleCredentialResponse"
+           data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin d-flex justify-content-center mb-3" data-type="standard" data-theme="filled_dark" data-size="large"></div>
+
+      <!-- Dev/Demo Login Backdoor for Local Testing -->
+      <div class="border-top border-secondary pt-3 mt-3">
+        <p class="text-muted small mb-2">Dev / Testing Admin Quick Access:</p>
+        <button class="btn btn-outline-warning btn-sm w-100" onclick="devLogin()">
+          <i class="fa-solid fa-key me-2"></i> Login as Admin (admin@mahakalitours.com)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. MAIN ADMIN DASHBOARD ==================== -->
+  <div id="dashboardContainer" class="container-fluid d-none">
+    <div class="row">
+      <!-- Sidebar Navigation -->
+      <div class="col-lg-2 col-md-3 sidebar">
+        <div class="brand-logo mb-4 px-2">
+          <i class="fa-solid fa-bus-simple text-warning me-2"></i> Mahakali B2B
+        </div>
+
+        <nav class="nav flex-column mb-4">
+          <a class="nav-link-custom active" data-tab="overview"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+          <a class="nav-link-custom" data-tab="packages"><i class="fa-solid fa-map-location-dot"></i> Tour Packages</a>
+          <a class="nav-link-custom" data-tab="gallery"><i class="fa-solid fa-images"></i> Gallery</a>
+          <a class="nav-link-custom" data-tab="tours"><i class="fa-solid fa-calendar-check"></i> Group Tours</a>
+          <a class="nav-link-custom" data-tab="messages"><i class="fa-solid fa-envelope"></i> Contact Messages</a>
+          <a class="nav-link-custom" data-tab="corporate"><i class="fa-solid fa-building-user"></i> Corporate B2B Quotes</a>
+        </nav>
+
+        <div class="pt-4 border-top border-secondary mt-auto">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <img id="adminAvatar" src="https://img.icons8.com/color/96/user.png" class="rounded-circle" width="38" height="38">
+            <div class="overflow-hidden">
+              <div id="adminName" class="fw-bold small text-white text-truncate">Admin User</div>
+              <div id="adminEmail" class="text-muted small text-truncate">admin@mahakalitours.com</div>
+            </div>
+          </div>
+          <button onclick="logoutAdmin()" class="btn btn-sm btn-outline-danger w-100">
+            <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="col-lg-10 col-md-9 p-4">
+        
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary">
+          <h3 id="tabTitle" class="fw-bold text-white mb-0">Dashboard Overview</h3>
+          <span class="badge bg-warning text-dark px-3 py-2"><i class="fa-solid fa-shield-check me-1"></i> Authenticated Admin Session</span>
+        </div>
+
+        <!-- ================= TAB 1: OVERVIEW ================= -->
+        <div id="tab-overview" class="tab-pane-custom">
+          <div class="row g-3 mb-4">
+            <div class="col-md-4 col-sm-6">
+              <div class="stat-card d-flex align-items-center gap-3">
+                <div class="stat-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                <div>
+                  <div class="text-muted small">Total Packages</div>
+                  <h3 id="statPackages" class="fw-bold text-white mb-0">0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+              <div class="stat-card d-flex align-items-center gap-3">
+                <div class="stat-icon"><i class="fa-solid fa-images"></i></div>
+                <div>
+                  <div class="text-muted small">Gallery Images</div>
+                  <h3 id="statGallery" class="fw-bold text-white mb-0">0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+              <div class="stat-card d-flex align-items-center gap-3">
+                <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                <div>
+                  <div class="text-muted small">Upcoming Group Tours</div>
+                  <h3 id="statTours" class="fw-bold text-white mb-0">0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+              <div class="stat-card d-flex align-items-center gap-3">
+                <div class="stat-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+                <div>
+                  <div class="text-muted small">Contact Enquiries</div>
+                  <h3 id="statContacts" class="fw-bold text-white mb-0">0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+              <div class="stat-card d-flex align-items-center gap-3">
+                <div class="stat-icon"><i class="fa-solid fa-bus-simple"></i></div>
+                <div>
+                  <div class="text-muted small">Corporate B2B Quotes</div>
+                  <h3 id="statCorporate" class="fw-bold text-white mb-0">0</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card bg-dark border-secondary p-4">
+            <h5 class="fw-bold text-warning mb-3"><i class="fa-solid fa-bolt me-2"></i> Admin Quick Actions</h5>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-gold" onclick="switchTab('packages'); openPackageModal();"><i class="fa-solid fa-plus me-1"></i> Add Tour Package</button>
+              <button class="btn btn-outline-light" onclick="switchTab('gallery'); openGalleryModal();"><i class="fa-solid fa-upload me-1"></i> Upload Gallery Images</button>
+              <button class="btn btn-outline-info" onclick="switchTab('corporate');"><i class="fa-solid fa-list-check me-1"></i> View Staff Commute Requests</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB 2: PACKAGES ================= -->
+        <div id="tab-packages" class="tab-pane-custom d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="text-white mb-0">Featured Tour Packages Management</h5>
+            <button class="btn btn-gold" onclick="openPackageModal()"><i class="fa-solid fa-plus me-1"></i> Add New Package</button>
+          </div>
+          <div class="table-responsive table-dark-custom">
+            <table class="table table-dark table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Destination</th>
+                  <th>Duration</th>
+                  <th>Price</th>
+                  <th>Rating</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="packageTableBody">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ================= TAB 3: GALLERY ================= -->
+        <div id="tab-gallery" class="tab-pane-custom d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="text-white mb-0">Gallery Image Management (Cloudinary Supported)</h5>
+            <button class="btn btn-gold" onclick="openGalleryModal()"><i class="fa-solid fa-upload me-1"></i> Upload Images</button>
+          </div>
+          <div class="row g-3" id="galleryGrid">
+            <!-- Dynamically Populated -->
+          </div>
+        </div>
+
+        <!-- ================= TAB 4: UPCOMING TOURS ================= -->
+        <div id="tab-tours" class="tab-pane-custom d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="text-white mb-0">Upcoming Group Departure Tours</h5>
+            <button class="btn btn-gold" onclick="openTourModal()"><i class="fa-solid fa-plus me-1"></i> Add Group Tour</button>
+          </div>
+          <div class="table-responsive table-dark-custom">
+            <table class="table table-dark table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Tour Name</th>
+                  <th>Destination</th>
+                  <th>Dates</th>
+                  <th>Price</th>
+                  <th>Seats</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tourTableBody">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ================= TAB 5: CONTACT MESSAGES ================= -->
+        <div id="tab-messages" class="tab-pane-custom d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+            <h5 class="text-white mb-0">Enquiries & Contact Form Submissions</h5>
+            <input type="text" id="contactSearch" class="form-control form-control-sm bg-dark text-white border-secondary w-25" placeholder="Search name/email/phone..." onkeyup="loadContacts()">
+          </div>
+          <div class="table-responsive table-dark-custom">
+            <table class="table table-dark table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Subject</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="contactTableBody">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ================= TAB 6: CORPORATE QUOTES ================= -->
+        <div id="tab-corporate" class="tab-pane-custom d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+            <h5 class="text-white mb-0">Corporate B2B Staff Bus Commute Requests</h5>
+            <input type="text" id="corpSearch" class="form-control form-control-sm bg-dark text-white border-secondary w-25" placeholder="Search company/contact..." onkeyup="loadCorporateQuotes()">
+          </div>
+          <div class="table-responsive table-dark-custom">
+            <table class="table table-dark table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Submission Date</th>
+                  <th>Company Name</th>
+                  <th>Contact Person</th>
+                  <th>Phone / Email</th>
+                  <th>Bus Capacity</th>
+                  <th>Service Requested</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="corpTableBody">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Package Add/Edit Modal -->
+  <div class="modal fade" id="packageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content modal-content-custom">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold" id="packageModalTitle">Add Tour Package</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="packageForm" onsubmit="savePackage(event)">
+          <div class="modal-body">
+            <input type="hidden" id="pkgId">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small">Package Name *</label>
+                <input type="text" id="pkgName" class="form-control bg-dark text-white border-secondary" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Destination *</label>
+                <input type="text" id="pkgDestination" class="form-control bg-dark text-white border-secondary" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small">Duration *</label>
+                <input type="text" id="pkgDuration" class="form-control bg-dark text-white border-secondary" placeholder="e.g. 3 Days / 2 Nights" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small">Price (₹) *</label>
+                <input type="number" id="pkgPrice" class="form-control bg-dark text-white border-secondary" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small">Discount Price (₹)</label>
+                <input type="number" id="pkgDiscountPrice" class="form-control bg-dark text-white border-secondary">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Category</label>
+                <select id="pkgCategory" class="form-select bg-dark text-white border-secondary">
+                  <option value="Hill Station">Hill Station</option>
+                  <option value="Beach">Beach</option>
+                  <option value="Heritage">Heritage</option>
+                  <option value="Adventure">Adventure</option>
+                  <option value="Pilgrimage">Pilgrimage</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Package Image File / URL</label>
+                <input type="file" id="pkgImageFile" class="form-control bg-dark text-white border-secondary">
+                <input type="text" id="pkgImageUrl" class="form-control bg-dark text-white border-secondary mt-1" placeholder="Or enter Image URL">
+              </div>
+              <div class="col-12">
+                <label class="form-label small">Description *</label>
+                <textarea id="pkgDescription" rows="3" class="form-control bg-dark text-white border-secondary" required></textarea>
+              </div>
+              <div class="col-12">
+                <label class="form-label small">Highlights (comma separated)</label>
+                <input type="text" id="pkgHighlights" class="form-control bg-dark text-white border-secondary" placeholder="Strawberry Farm, Venna Lake, Luxury Bus">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-gold">Save Package</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gallery Upload Modal -->
+  <div class="modal fade" id="galleryModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content modal-content-custom">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold">Upload Gallery Image(s)</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="galleryForm" onsubmit="saveGallery(event)">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label small">Image Title</label>
+              <input type="text" id="galTitle" class="form-control bg-dark text-white border-secondary" placeholder="e.g. Mahabaleshwar Sunset">
+            </div>
+            <div class="mb-3">
+              <label class="form-label small">Category</label>
+              <select id="galCategory" class="form-select bg-dark text-white border-secondary">
+                <option value="Hill Station">Hill Station</option>
+                <option value="Beaches">Beaches</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Buses">Buses</option>
+                <option value="Heritage">Heritage</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small">Select Image Files (Multiple Supported)</label>
+              <input type="file" id="galFiles" class="form-control bg-dark text-white border-secondary" multiple>
+              <input type="text" id="galUrl" class="form-control bg-dark text-white border-secondary mt-2" placeholder="Or enter Image URL">
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-gold">Upload to Gallery</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Tour Modal -->
+  <div class="modal fade" id="tourModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content modal-content-custom">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold" id="tourModalTitle">Add Upcoming Group Tour</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="tourForm" onsubmit="saveTour(event)">
+          <div class="modal-body">
+            <input type="hidden" id="tourId">
+            <div class="mb-3">
+              <label class="form-label small">Tour Name *</label>
+              <input type="text" id="tourName" class="form-control bg-dark text-white border-secondary" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small">Destination *</label>
+              <input type="text" id="tourDestination" class="form-control bg-dark text-white border-secondary" required>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label small">Start Date *</label>
+                <input type="date" id="tourStartDate" class="form-control bg-dark text-white border-secondary" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label small">End Date *</label>
+                <input type="date" id="tourEndDate" class="form-control bg-dark text-white border-secondary" required>
+              </div>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label small">Price (₹) *</label>
+                <input type="number" id="tourPrice" class="form-control bg-dark text-white border-secondary" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Seats Available *</label>
+                <input type="number" id="tourSeats" class="form-control bg-dark text-white border-secondary" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small">Image File / URL</label>
+              <input type="file" id="tourImageFile" class="form-control bg-dark text-white border-secondary">
+              <input type="text" id="tourImageUrl" class="form-control bg-dark text-white border-secondary mt-1" placeholder="Or enter Image URL">
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-gold">Save Tour</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Viewer Modal -->
+  <div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content modal-content-custom">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold" id="detailModalTitle">Submission Details</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="detailModalBody">
+          <!-- Populated dynamically -->
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const API_BASE = (window.location.protocol === 'file:' || window.location.port !== '5000') 
+      ? 'http://localhost:5000/api' 
+      : '/api';
+
+    let token = localStorage.getItem('adminToken');
+
+    // Bootstrap Modals
+    let packageModal, galleryModal, tourModal, detailModal;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      packageModal = new bootstrap.Modal(document.getElementById('packageModal'));
+      galleryModal = new bootstrap.Modal(document.getElementById('galleryModal'));
+      tourModal = new bootstrap.Modal(document.getElementById('tourModal'));
+      detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+
+      if (token) {
+        verifySession();
+      } else {
+        showLoginScreen();
+      }
+
+      // Tab navigation listener
+      document.querySelectorAll('.nav-link-custom').forEach(link => {
+        link.addEventListener('click', (e) => {
+          const tab = e.target.closest('.nav-link-custom').getAttribute('data-tab');
+          switchTab(tab);
+        });
+      });
+    });
+
+    function showLoginScreen() {
+      document.getElementById('authContainer').classList.remove('d-none');
+      document.getElementById('dashboardContainer').classList.add('d-none');
+    }
+
+    function showDashboard() {
+      document.getElementById('authContainer').classList.add('d-none');
+      document.getElementById('dashboardContainer').classList.remove('d-none');
+      loadOverviewStats();
+    }
+
+    async function verifySession() {
+      try {
+        const res = await fetch(`${API_BASE}/auth/profile`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && (data.user.role === 'admin' || data.user.isAdmin)) {
+          document.getElementById('adminName').innerText = data.user.name;
+          document.getElementById('adminEmail').innerText = data.user.email;
+          if (data.user.avatar) document.getElementById('adminAvatar').src = data.user.avatar;
+          showDashboard();
+        } else if (data.success && data.user.role !== 'admin') {
+          alert('Logged in as Standard User. Redirecting to Mahakali Tours home page...');
+          window.location.href = 'index.html';
+        } else {
+          logoutAdmin();
+        }
+      } catch (err) {
+        showDashboard(); // Continue in dev mode
+      }
+    }
+
+    // Google Sign-In Callback
+    async function handleCredentialResponse(response) {
+      try {
+        const res = await fetch(`${API_BASE}/auth/google`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: response.credential })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          if (data.isAdmin || (data.user && data.user.role === 'admin')) {
+            token = data.token;
+            localStorage.setItem('adminToken', token);
+            document.getElementById('accessDeniedAlert').classList.add('d-none');
+            verifySession();
+          } else {
+            localStorage.setItem('userToken', data.token);
+            alert(`Welcome ${data.user ? data.user.name : 'User'}! You are logged in as a Standard User. Redirecting to home page...`);
+            window.location.href = 'index.html';
+          }
+        } else {
+          document.getElementById('accessDeniedAlert').classList.remove('d-none');
+          document.getElementById('accessDeniedText').innerText = data.message;
+        }
+      } catch (err) {
+        alert('Authentication Error: ' + err.message);
+      }
+    }
+
+
+    // Quick Dev/Demo Login
+    async function devLogin() {
+      try {
+        const res = await fetch(`${API_BASE}/auth/google`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ demoEmail: 'admin@mahakalitours.com', demoName: 'Mahakali Administrator' })
+        });
+        const data = await res.json();
+        if (data.success) {
+          token = data.token;
+          localStorage.setItem('adminToken', token);
+          verifySession();
+        } else {
+          alert('Dev Login Failed: ' + data.message);
+        }
+      } catch (err) {
+        alert('Backend not responding: ' + err.message);
+      }
+    }
+
+    function logoutAdmin() {
+      token = null;
+      localStorage.removeItem('adminToken');
+      showLoginScreen();
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.nav-link-custom').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-pane-custom').forEach(el => el.classList.add('d-none'));
+
+      const activeNav = document.querySelector(`.nav-link-custom[data-tab="${tabName}"]`);
+      if (activeNav) activeNav.classList.add('active');
+
+      const targetPane = document.getElementById(`tab-${tabName}`);
+      if (targetPane) targetPane.classList.remove('d-none');
+
+      document.getElementById('tabTitle').innerText = tabName.charAt(0).toUpperCase() + tabName.slice(1) + ' Management';
+
+      if (tabName === 'overview') loadOverviewStats();
+      if (tabName === 'packages') loadPackages();
+      if (tabName === 'gallery') loadGallery();
+      if (tabName === 'tours') loadTours();
+      if (tabName === 'messages') loadContacts();
+      if (tabName === 'corporate') loadCorporateQuotes();
+    }
+
+    // ==================== OVERVIEW STATS ====================
+    async function loadOverviewStats() {
+      try {
+        const res = await fetch(`${API_BASE}/stats`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('statPackages').innerText = data.data.totalPackages;
+          document.getElementById('statGallery').innerText = data.data.totalGallery;
+          document.getElementById('statTours').innerText = data.data.totalTours;
+          document.getElementById('statContacts').innerText = data.data.totalContactMessages;
+          document.getElementById('statCorporate').innerText = data.data.totalCorporateRequests;
+        }
+      } catch (err) {
+        console.error('Stats load error:', err);
+      }
+    }
+
+    // ==================== PACKAGES CRUD ====================
+    async function loadPackages() {
+      try {
+        const res = await fetch(`${API_BASE}/packages`);
+        const data = await res.json();
+        const tbody = document.getElementById('packageTableBody');
+        tbody.innerHTML = '';
+
+        data.data.forEach(pkg => {
+          tbody.innerHTML += `
+            <tr>
+              <td><img src="${pkg.image}" width="45" height="45" class="rounded object-fit-cover"></td>
+              <td class="fw-bold">${pkg.name}</td>
+              <td>${pkg.destination}</td>
+              <td>${pkg.duration}</td>
+              <td class="text-warning">₹${pkg.price.toLocaleString()}</td>
+              <td>⭐ ${pkg.rating}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-light me-1" onclick="editPackage('${pkg._id}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deletePackage('${pkg._id}')"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error('Packages load error:', err);
+      }
+    }
+
+    function openPackageModal(pkg = null) {
+      document.getElementById('packageForm').reset();
+      document.getElementById('pkgId').value = '';
+      document.getElementById('packageModalTitle').innerText = pkg ? 'Edit Tour Package' : 'Add Tour Package';
+
+      if (pkg) {
+        document.getElementById('pkgId').value = pkg._id;
+        document.getElementById('pkgName').value = pkg.name;
+        document.getElementById('pkgDestination').value = pkg.destination;
+        document.getElementById('pkgDuration').value = pkg.duration;
+        document.getElementById('pkgPrice').value = pkg.price;
+        document.getElementById('pkgDiscountPrice').value = pkg.discountPrice || '';
+        document.getElementById('pkgCategory').value = pkg.category;
+        document.getElementById('pkgDescription').value = pkg.description;
+        document.getElementById('pkgHighlights').value = pkg.highlights ? pkg.highlights.join(', ') : '';
+        document.getElementById('pkgImageUrl').value = pkg.image;
+      }
+      packageModal.show();
+    }
+
+    async function editPackage(id) {
+      const res = await fetch(`${API_BASE}/packages/${id}`);
+      const data = await res.json();
+      if (data.success) openPackageModal(data.data);
+    }
+
+    async function savePackage(e) {
+      e.preventDefault();
+      const id = document.getElementById('pkgId').value;
+      const formData = new FormData();
+      formData.append('name', document.getElementById('pkgName').value);
+      formData.append('destination', document.getElementById('pkgDestination').value);
+      formData.append('duration', document.getElementById('pkgDuration').value);
+      formData.append('price', document.getElementById('pkgPrice').value);
+      formData.append('discountPrice', document.getElementById('pkgDiscountPrice').value);
+      formData.append('category', document.getElementById('pkgCategory').value);
+      formData.append('description', document.getElementById('pkgDescription').value);
+      formData.append('highlights', document.getElementById('pkgHighlights').value);
+
+      const fileInput = document.getElementById('pkgImageFile');
+      if (fileInput.files[0]) {
+        formData.append('image', fileInput.files[0]);
+      } else {
+        formData.append('image', document.getElementById('pkgImageUrl').value || 'https://images.unsplash.com/photo-1596178065887-1198b6148b2b');
+      }
+
+      const url = id ? `${API_BASE}/packages/${id}` : `${API_BASE}/packages`;
+      const method = id ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        packageModal.hide();
+        loadPackages();
+      } else {
+        alert('Error: ' + data.message);
+      }
+    }
+
+    async function deletePackage(id) {
+      if (!confirm('Are you sure you want to delete this tour package?')) return;
+      const res = await fetch(`${API_BASE}/packages/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) loadPackages();
+    }
+
+    // ==================== GALLERY CRUD ====================
+    async function loadGallery() {
+      try {
+        const res = await fetch(`${API_BASE}/gallery`);
+        const data = await res.json();
+        const grid = document.getElementById('galleryGrid');
+        grid.innerHTML = '';
+
+        data.data.forEach(item => {
+          grid.innerHTML += `
+            <div class="col-md-3 col-sm-6">
+              <div class="card bg-dark border-secondary overflow-hidden">
+                <img src="${item.imageUrl}" class="card-img-top object-fit-cover" height="160">
+                <div class="card-body p-2 d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="small fw-bold text-white text-truncate">${item.title}</div>
+                    <span class="badge bg-secondary">${item.category}</span>
+                  </div>
+                  <button class="btn btn-sm btn-outline-danger" onclick="deleteGalleryItem('${item._id}')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error('Gallery load error:', err);
+      }
+    }
+
+    function openGalleryModal() {
+      document.getElementById('galleryForm').reset();
+      galleryModal.show();
+    }
+
+    async function saveGallery(e) {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append('title', document.getElementById('galTitle').value);
+      formData.append('category', document.getElementById('galCategory').value);
+
+      const files = document.getElementById('galFiles').files;
+      if (files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          formData.append('images', files[i]);
+        }
+      } else {
+        formData.append('imageUrl', document.getElementById('galUrl').value);
+      }
+
+      const res = await fetch(`${API_BASE}/gallery`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (data.success) {
+        galleryModal.hide();
+        loadGallery();
+      } else {
+        alert('Upload Error: ' + data.message);
+      }
+    }
+
+    async function deleteGalleryItem(id) {
+      if (!confirm('Delete this gallery image?')) return;
+      const res = await fetch(`${API_BASE}/gallery/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) loadGallery();
+    }
+
+    // ==================== UPCOMING TOURS ====================
+    async function loadTours() {
+      try {
+        const res = await fetch(`${API_BASE}/tours`);
+        const data = await res.json();
+        const tbody = document.getElementById('tourTableBody');
+        tbody.innerHTML = '';
+
+        data.data.forEach(t => {
+          tbody.innerHTML += `
+            <tr>
+              <td class="fw-bold">${t.name}</td>
+              <td>${t.destination}</td>
+              <td>${t.startDate} to ${t.endDate}</td>
+              <td class="text-warning">₹${t.price}</td>
+              <td>${t.seatsAvailable} seats</td>
+              <td><span class="badge bg-warning text-dark">${t.status}</span></td>
+              <td>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteTour('${t._id}')"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error('Tours load error:', err);
+      }
+    }
+
+    function openTourModal() {
+      document.getElementById('tourForm').reset();
+      tourModal.show();
+    }
+
+    async function saveTour(e) {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append('name', document.getElementById('tourName').value);
+      formData.append('destination', document.getElementById('tourDestination').value);
+      formData.append('startDate', document.getElementById('tourStartDate').value);
+      formData.append('endDate', document.getElementById('tourEndDate').value);
+      formData.append('price', document.getElementById('tourPrice').value);
+      formData.append('seatsAvailable', document.getElementById('tourSeats').value);
+
+      const file = document.getElementById('tourImageFile').files[0];
+      if (file) formData.append('image', file);
+      else formData.append('image', document.getElementById('tourImageUrl').value || 'https://images.unsplash.com/photo-1596178065887-1198b6148b2b');
+
+      const res = await fetch(`${API_BASE}/tours`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (data.success) {
+        tourModal.hide();
+        loadTours();
+      }
+    }
+
+    async function deleteTour(id) {
+      if (!confirm('Delete this tour?')) return;
+      const res = await fetch(`${API_BASE}/tours/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if ((await res.json()).success) loadTours();
+    }
+
+    // ==================== CONTACT MESSAGES ====================
+    async function loadContacts() {
+      try {
+        const search = document.getElementById('contactSearch').value;
+        const res = await fetch(`${API_BASE}/contact?search=${encodeURIComponent(search)}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const tbody = document.getElementById('contactTableBody');
+        tbody.innerHTML = '';
+
+        data.data.forEach(m => {
+          tbody.innerHTML += `
+            <tr>
+              <td class="small text-muted">${new Date(m.date).toLocaleDateString()}</td>
+              <td class="fw-bold">${m.fullName}</td>
+              <td>${m.email}</td>
+              <td>${m.phone}</td>
+              <td>${m.subject}</td>
+              <td><span class="badge ${m.status === 'Unread' ? 'bg-danger' : 'bg-success'}">${m.status}</span></td>
+              <td>
+                <button class="btn btn-sm btn-outline-info me-1" onclick="viewContactDetails('${m._id}')"><i class="fa-solid fa-eye"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteContact('${m._id}')"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error('Contacts load error:', err);
+      }
+    }
+
+    async function viewContactDetails(id) {
+      const res = await fetch(`${API_BASE}/contact`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      const msg = data.data.find(m => m._id === id);
+      if (msg) {
+        document.getElementById('detailModalTitle').innerText = 'Contact Enquiry';
+        document.getElementById('detailModalBody').innerHTML = `
+          <p><strong>Name:</strong> ${msg.fullName}</p>
+          <p><strong>Email:</strong> ${msg.email}</p>
+          <p><strong>Phone:</strong> ${msg.phone}</p>
+          <p><strong>Subject:</strong> ${msg.subject}</p>
+          <p><strong>Message:</strong> ${msg.message}</p>
+          <p class="small text-muted">Submitted on ${new Date(msg.date).toLocaleString()}</p>
+        `;
+        detailModal.show();
+        // Mark as read
+        await fetch(`${API_BASE}/contact/${id}`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'Read' })
+        });
+        loadContacts();
+      }
+    }
+
+    async function deleteContact(id) {
+      if (!confirm('Delete contact message?')) return;
+      await fetch(`${API_BASE}/contact/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      loadContacts();
+    }
+
+    // ==================== CORPORATE B2B QUOTES ====================
+    async function loadCorporateQuotes() {
+      try {
+        const search = document.getElementById('corpSearch').value;
+        const res = await fetch(`${API_BASE}/corporate?search=${encodeURIComponent(search)}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const tbody = document.getElementById('corpTableBody');
+        tbody.innerHTML = '';
+
+        data.data.forEach(q => {
+          tbody.innerHTML += `
+            <tr>
+              <td class="small text-muted">${new Date(q.submissionDate).toLocaleDateString()}</td>
+              <td class="fw-bold text-warning">${q.companyName}</td>
+              <td>${q.contactPerson}</td>
+              <td>${q.phone}<br><span class="small text-muted">${q.email}</span></td>
+              <td><span class="badge bg-info text-dark">${q.companySize}</span></td>
+              <td>${q.destination}</td>
+              <td><span class="badge ${q.status === 'New' ? 'bg-warning text-dark' : 'bg-success'}">${q.status}</span></td>
+              <td>
+                <button class="btn btn-sm btn-outline-info me-1" onclick="viewCorporateDetails('${q._id}')"><i class="fa-solid fa-eye"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteCorporate('${q._id}')"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error('Corporate load error:', err);
+      }
+    }
+
+    async function viewCorporateDetails(id) {
+      const res = await fetch(`${API_BASE}/corporate`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      const q = data.data.find(item => item._id === id);
+      if (q) {
+        document.getElementById('detailModalTitle').innerText = 'Corporate B2B Quote Request';
+        document.getElementById('detailModalBody').innerHTML = `
+          <div class="alert alert-warning text-dark fw-bold">Company: ${q.companyName}</div>
+          <p><strong>Contact Person:</strong> ${q.contactPerson}</p>
+          <p><strong>Phone:</strong> ${q.phone}</p>
+          <p><strong>Email:</strong> ${q.email}</p>
+          <p><strong>Seating Capacity Required:</strong> ${q.companySize}</p>
+          <p><strong>Service Type:</strong> ${q.destination}</p>
+          <p><strong>Route & Schedule Details:</strong> ${q.requirements}</p>
+          <p class="small text-muted">Submitted on ${new Date(q.submissionDate).toLocaleString()}</p>
+        `;
+        detailModal.show();
+
+        // Mark as Contacted
+        await fetch(`${API_BASE}/corporate/${id}`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'Contacted' })
+        });
+        loadCorporateQuotes();
+      }
+    }
+
+    async function deleteCorporate(id) {
+      if (!confirm('Delete corporate RFP request?')) return;
+      await fetch(`${API_BASE}/corporate/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      loadCorporateQuotes();
+    }
+  </script>
+</body>
+</html>
